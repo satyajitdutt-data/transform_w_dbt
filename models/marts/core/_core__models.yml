@@ -1,0 +1,42 @@
+models:
+  - name: hubspot_customers 
+    description: Reverse ETL model containing customer data needed in Hubspot 
+    columns: 
+      - name: c_custkey
+        description: '{{ doc("customer_key") }}'
+        tests: 
+          - unique 
+          - not_null 
+      - name: c_name
+      - name: c_address
+      - name: c_phone
+
+  - name: order_line_items 
+    description: Details orders and their line items 
+    columns: 
+      - name: line_item_key 
+        description: Unique ID of an order's line item
+        tests:
+          - not_null 
+          - unique
+      - name: order_key 
+      - name: order_priority 
+      - name: order_status_code 
+      - name: return_flag_code 
+      - name: revenue 
+      - name: item_quantity 
+      - name: total_order_items 
+        description: Total number of items in an order across multiple line items 
+      - name: total_price_usd
+
+  - name: returned_item_customers 
+    description: Calculated revenue lost from returned items per customer 
+    columns:
+      - name: c_custkey 
+      - name: c_name 
+      - name: revenue
+        description: The sum of order price in USD after any discounts
+      - name: c_acctbal 
+      - name: n_name 
+      - name: c_address 
+      - name: c_phone

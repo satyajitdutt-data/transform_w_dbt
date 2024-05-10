@@ -1,0 +1,40 @@
+models: 
+  - name: stg_tpch__customers 
+
+  - name: stg_tpch__line_items
+    description: Staging model for line items source 
+    columns: 
+      - name: line_item_key 
+        description: Generated SK representing a unique line item 
+        tests: 
+          - not_null 
+          - unique 
+      - name: order_key
+        description: '{{ doc("order_key") }}'
+      - name: part_key 
+      - name: supplier_key 
+      - name: line_number 
+      - name: item_quantity 
+      - name: extended_price_usd
+      - name: discount_amount_usd
+      - name: tax_amount_usd
+      - name: return_flag_code
+      - name: line_status_code
+      - name: ship_date
+
+  - name: stg_tpch__orders 
+    description: Staging model for orders source 
+    columns: 
+      - name: order_key
+        description: > 
+          '{{ doc("order_key") }}''
+      - name: customer_key
+        description: '{{ doc("customer_key") }}'
+      - name: total_price_usd
+      - name: order_date 
+      - name: order_priority 
+      - name: clerk 
+      - name: ship_priority_code
+
+  - name: stg_tpch__nations
+

@@ -1,0 +1,78 @@
+sources:
+  - name: tpch_sf1
+    database: snowflake_sample_data
+    schema: tpch_sf1
+    tables: 
+      - name: customer
+
+      - name: lineitem 
+        description: Includes the specific line items of an order 
+        tests: 
+          - dbt_expectations.expect_compound_columns_to_be_unique:
+              column_list: ['l_orderkey', 'l_linenumber']
+        columns: 
+          - name: l_orderkey 
+            description: '{{ doc("order_key") }}'
+            tests: 
+              - not_null
+          - name: l_partkey 
+            tests: 
+              - not_null 
+              - relationships:
+                  to: source('tpch_sf1', 'part')
+                  name: is_fk_lineitem.l_partkey
+                  field: p_partkey
+          - name: l_suppkey 
+            tests: 
+              - not_null 
+              - relationships:
+                  to: source('tpch_sf1', 'supplier')
+                  name: is_fk_lineitem.l_suppkey
+                  field: s_suppkey
+          - name: l_linenumber 
+            tests: 
+              - not_null 
+          - name: l_quantity 
+          - name: l_extendedprice 
+          - name: l_discount 
+          - name: l_tax 
+          - name: l_returnflag 
+            tests: 
+              - not_null
+              - accepted_values:
+                  values: ['R', 'N', 'A']
+          - name: l_linestatus 
+            tests: 
+              - not_null
+              - accepted_values:
+                  values: ['F', 'O']
+          - name: l_shipdate 
+
+      - name: orders 
+        description: Includes customer orders and the details of those orders 
+        columns: 
+          - name: o_orderkey 
+            description: '{{ doc("order_key") }}'
+            tests: 
+              - unique 
+              - not_null 
+          - name: o_custkey 
+            description: '{{ doc("customer_key") }}'
+            tests: 
+              - not_null 
+              - relationships:
+                  to: source('tpch_sf1', 'customer')
+                  name: is_fk_lineitem.o_custkey
+                  field: c_custkey
+          - name: o_orderstatus 
+            tests: 
+              - not_null
+              - accepted_values:
+                  values: ['F', 'O', 'P']
+          - name: o_totalprice 
+          - name: o_orderdate 
+          - name: o_order_priority 
+          - name: o_clerk 
+          - name: o_shippriority 
+
+      - name: nation
