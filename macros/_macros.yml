@@ -1,4 +1,8 @@
 macros:
+  - name: generate_schema_name 
+    description: >
+      Overrides the default macro that creates default schema names using the default or 
+      the default as the prefix; when the schema name is defined, this selects only the name that is defined 
   - name: split_column_values 
     description: Takes one column as input and splits it into two based on a specified condition
     arguments:
