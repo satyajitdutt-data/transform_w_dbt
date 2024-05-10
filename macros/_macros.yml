@@ -1,0 +1,13 @@
+macros:
+  - name: split_column_values 
+    description: Takes one column as input and splits it into two based on a specified condition
+    arguments:
+      - name: column_name 
+        description: The column to split into two. 
+        type: string
+      - name: new_column_name 
+        description: The name of the new column for the first part of the string
+        type: string
+      - name: new_column_name_2
+        description: The name of the new column for the second part of the string
+        type: string
