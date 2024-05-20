@@ -1,0 +1,89 @@
+# fmcg_aggregation style guide 
+This file contains guidelines on the style and conventions to use of aggregating our FMCG data at a monthly/quarterly level. Please ensure your code matches the guidelines outlined in each section. 
+
+## Model Organisation
+
+Our models (typically) fit into two main categories:
+
+| Category     | Description                                             |
+| -------------| ------------------------------------------------------------------------------------------------------------------------------|
+| Staging      | Contains models which clean and standardize our raw spending data, Bundesland regional data and household demographics        |
+| Intermediate | Contains modular models referenced in Marts                                                                                   |
+| Marts        | Contains models which combine or heavily transform data                                                                       |
+
+Things to note:
+- Different types of models will exist in each of the above categories. 
+- Facts exist in `Marts`
+
+## Model Layers 
+- Only models in staging should select from sources (the raw data received from Nielsen IQ). We only standardise the source (raw) data in the staging layer 
+  preparing it for the more relevant data transformations in the intermediate and marts layers such as expenditure aggregation, re-coding demographics into categorical variables,
+  computing of net income etc. In the 'Intermediate' layer, we just reference the models from the staging layer and in the Marts layer we just reference the 'Intermediate' models.
+  It follows from top to bottom (See Model Organisation) 
+
+## Model Configurations
+
+- Each model should have a primary key (this can be the household ID, the transaction key, or the Bundesland) that can be used to identify a unique row, and should be named 
+  <hh_id, transac_id, bundesland_id>.
+- Staging models should always be views. 
+- Intermediate views should be views. 
+- Mart models should always be tables. 
+
+## Naming Conventions [NEED TO CLARIFY WITH MADISON]
+
+- All objects should be plural. 
+
+- All models should have a prefix that indicates their DAG stage in the flow. 
+
+- All models should use the naming convention <type/dag_stage>_<source/topic>_<additional_context>. 
+
+- Schema, table, and column names should be in `snake_case`. 
+
+## Documentation
+
+- Every source should include a description and all of its field name. 
+
+- If a field is repeated more than once throughout the project, a doc block should be used to define it. 
+
+- Doc blocks should be written in models/docs in a file following the format `docs__fmcg_raw.yml`. This file will be the labels for our columns with a brief description of the 
+  content found inside.
+
+# YAML [Is this needed?]
+
+- Every subdirectory should contain its own `.yml` file(s) which contains configurations and documentation for the models in that subdirectory.
+
+- YAML files should start with `_` to make them easier to find. 
+
+- They should be named with the convention `_<description>_<config>`
+
+## Testing 
+
+- At a minimum, the primary key should always have a `not_null` and `unique` test. We should check that the household ID is a length 15 characters (all numbers), checking that
+  total expenditure is the sum of the 6 categories!
+- Tests should be applied at the source and model level only, not on staging models. [Clarify what this means! Perhaps makes sense after the lecture]
+
+## SQL Guidelines 
+
+- Do not optimize for fewer lines of code. Make everything easy to understand and digest. The final column names should be easily understandable (i.e. fmcg_euro)
+  We are mostly doing monthly aggregations on total FMCG expenditure and of spending in each of the 6 categories. 
+
+- Use trailing commas, except on the last column used! This is often the problem at the end of each CTE or query. Use CTRL + F and put in a comma and check if there is 
+  an extra comma at the end of each CTE/query
+
+- Indents should be 4 spaces. 
+
+- Always use CTEs. Never subqueries and Tobias will kill me if he doesn't understand it! 
+
+- For each of the 7 aggregations (total and 6 categories, always follow it with _euro (i.e. total spending is fmcg_euro, total spending from category 1 is cat1_euro)
+
+# CTEs
+
+- Don't forget that ONLY the first CTE starts with WITH and after the first CTE to the 2nd last CTE, it should be followed by a comma and not a semi-colon. 
+
+- CTEs that are duplicated across models should be pulled out and created as their own models. This way we use the modularity of dbt so we don't have to have unnecessary lines of code
+  when we can easily reference it.  
+
+- Opt for filtering within import CTEs rather than logical CTEs. [ASK MADISON WHAT THIS MEANS!]
+
+- Your models should always end with a simple SELECT statement form the last CTE in order to make debugging easier. This way, we can work backwards and see by changing the previous CTE's where
+  something went wrong and how to fix it. 
